@@ -32,23 +32,25 @@ function apply_config() {
 	echo "--- Settings To Commit ---"
 	for i in "${!CONFIG_SETTINGS[@]}"; do
 		line="${CONFIG_SETTINGS[$i]}"
-		echo $line
 
 		case ${line} in
 			"") ;;
 			"POWER_CAP:") # TODO: Power cap must be set first because it resets the settings
 				next_line="${CONFIG_SETTINGS[$i+1]}"
+				echo $line
 				echo $next_line
 				echo "${next_line}" > "$path/$POWER_CAP_FILE"
 				;;
 			"OD_SCLK:") 
 				next_line="${CONFIG_SETTINGS[$i+1]}"
 				args=($next_line)
+				echo $line
 				echo $next_line
 				echo "s ${args[0]%:} ${args[1]%Mhz}" > "$target"
 				;;
 			"OD_VDDGFX_OFFSET:")
 				next_line="${CONFIG_SETTINGS[$i+1]}"
+				echo $line
 				echo $next_line
 				echo "vo ${next_line%mV}" > "$target"
 				;;
