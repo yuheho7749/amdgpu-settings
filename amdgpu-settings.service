@@ -8,7 +8,7 @@ Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/local/bin/amdgpu-settings
 ExecStop=/usr/local/bin/amdgpu-settings --reset
-ExecReload=/usr/local/bin/amdgpu-settings
+ExecReload=/usr/local/bin/amdgpu-settings --reset; /usr/local/bin/amdgpu-settings
 
 [Install]
 WantedBy=multi-user.target
