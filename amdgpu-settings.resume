@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+if [ "$1" == "post" ] && [ "$(/usr/sbin/systemctl is-active amdgpu-settings)" == "inactive" ]; then
+	/usr/sbin/systemctl reload amdgpu-settings
+fi

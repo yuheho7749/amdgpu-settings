@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CONFIG_FILE=/etc/default/amdgpu-settings-configs
+CONFIG_FILE=/etc/default/amdgpu-settings.config
 LOCAL_CONFIG_FILE=./amdgpu-settings.config
 CARD_NUM=card1
 SETTINGS_PREFIX=/sys/class/drm

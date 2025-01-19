@@ -1,0 +1,14 @@
+[Unit]
+Description=Set amdgpu settings from a config file
+After=multi-user.target systemd-user-sessions.service
+Wants=modprobe@amdgpu.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/amdgpu-settings
+ExecStop=/usr/local/bin/amdgpu-settings --reset
+ExecReload=/usr/local/bin/amdgpu-settings
+
+[Install]
+WantedBy=multi-user.target
