@@ -6,6 +6,7 @@ CARD_NUM=card1
 SETTINGS_PREFIX=/sys/class/drm
 SETTINGS_SUFFIX=device
 TARGET_FILE=pp_od_clk_voltage
+POWER_CAP_FILE=hwmon/hwmon1/power1_cap
 
 function list_configs() {
 	path="$SETTINGS_PREFIX/$CARD_NUM/$SETTINGS_SUFFIX"
@@ -14,6 +15,7 @@ function list_configs() {
 	exit 0
 }
 
+# TODO: Reset the power cap too
 function reset_to_default() {
 	path="$SETTINGS_PREFIX/$CARD_NUM/$SETTINGS_SUFFIX"
 	target="$path/$TARGET_FILE"
@@ -30,19 +32,23 @@ function apply_config() {
 	echo "--- Settings To Commit ---"
 	for i in "${!CONFIG_SETTINGS[@]}"; do
 		line="${CONFIG_SETTINGS[$i]}"
+		echo $line
 
 		case ${line} in
 			"") ;;
+			"POWER_CAP:") # TODO: Power cap must be set first because it resets the settings
+				next_line="${CONFIG_SETTINGS[$i+1]}"
+				echo $next_line
+				echo "${next_line}" > "$path/$POWER_CAP_FILE"
+				;;
 			"OD_SCLK:") 
 				next_line="${CONFIG_SETTINGS[$i+1]}"
 				args=($next_line)
-				echo $line
 				echo $next_line
 				echo "s ${args[0]%:} ${args[1]%Mhz}" > "$target"
 				;;
 			"OD_VDDGFX_OFFSET:")
 				next_line="${CONFIG_SETTINGS[$i+1]}"
-				echo $line
 				echo $next_line
 				echo "vo ${next_line%mV}" > "$target"
 				;;
