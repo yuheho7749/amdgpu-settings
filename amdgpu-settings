@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+CONFIG_FILE=/etc/default/amdgpu-settings-configs
+LOCAL_CONFIG_FILE=./amdgpu-settings.config
+CARD_NUM=card1
+SETTINGS_PREFIX=/sys/class/drm
+SETTINGS_SUFFIX=device
+TARGET_FILE=pp_od_clk_voltage
+
+function list_configs() {
+	path="$SETTINGS_PREFIX/$CARD_NUM/$SETTINGS_SUFFIX"
+	target="$path/$TARGET_FILE"
+	cat "$target"
+	exit 0
+}
+
+function reset_to_default() {
+	path="$SETTINGS_PREFIX/$CARD_NUM/$SETTINGS_SUFFIX"
+	target="$path/$TARGET_FILE"
+	echo "Resetting to default settings at $target"
+	echo "r" > "$target"
+	exit 0
+}
+
+function apply_config() {
+	path="$SETTINGS_PREFIX/$CARD_NUM/$SETTINGS_SUFFIX"
+	target="$path/$TARGET_FILE"
+	# Read and parse from config file
+	mapfile -t CONFIG_SETTINGS < "$CONFIG_FILE"
+	echo "--- Settings To Commit ---"
+	for i in "${!CONFIG_SETTINGS[@]}"; do
+		line="${CONFIG_SETTINGS[$i]}"
+
+		case ${line} in
+			"") ;;
+			"OD_SCLK:") 
+				next_line="${CONFIG_SETTINGS[$i+1]}"
+				args=($next_line)
+				echo $line
+				echo $next_line
+				echo "s ${args[0]%:} ${args[1]%Mhz}" > "$target"
+				;;
+			"OD_VDDGFX_OFFSET:")
+				next_line="${CONFIG_SETTINGS[$i+1]}"
+				echo $line
+				echo $next_line
+				echo "vo ${next_line%mV}" > "$target"
+				;;
+			*)
+				# echo "Expected or skipped"
+				;;
+		esac
+	done
+	echo "-------------------------"
+	echo "Commiting changes to $target"
+	echo "c" > "$target"
+	exit 0
+}
+
+# Parse arguments
+if [ "$1" == "-l" ] || [ "$1" == "--list" ] ; then
+	list_configs	
+elif [ "$1" == "-r" ] || [ "$1" == "--reset" ] ; then
+	reset_to_default
+elif [ "$1" == "-c" ] || [ "$1" == "--card" ] ; then
+	CARD_NUM="$2"
+	apply_config
+else
+	apply_config
+fi
