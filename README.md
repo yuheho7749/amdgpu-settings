@@ -1,4 +1,5 @@
 # AMDGPU Settings
+***Deprecated!!! New version available [here](https://github.com/yuheho7749/amdgpu-settings-rust)***
 
 Scripts to set custom amdgpu settings on Linux. Note that this is only tested on RDNA3 gpu (RX 7700 XT) on Arch Linux (kernel 6.12 or later).
 
